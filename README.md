@@ -71,12 +71,13 @@ DOT_DYNAMIC_SCOPES = {
 
 You then need to register the scopes used by your application. This is done in the
 same way regardless of whether you are using a separate resource server or not.
-Scopes are registered using the `Scope.register` method - this method will transparently
-either call out to the `RESOURCE_SERVER_REGISTER_SCOPE_URL` if it is defined, or
-create an instance in the local database if it is not defined.
+Scopes are registered using the `Scope.register` method - this method will create
+a scope instance in the local database and, if `RESOURCE_SERVER_REGISTER_SCOPE_URL`
+is defined, make the call-out to register the scope with the authorisation server.
 
-A good place to create scopes is in a post-migrate handler (assuming you are applying
-your database migrations on each deploy, which you should be!). For example, in `apps.py`:
+A good place to register scopes is in a post-migrate handler (assuming you are
+applying your database migrations on each deploy, which you should be!). For
+example, in `apps.py`:
 
 ```python
 from django.apps import AppConfig as BaseAppConfig
