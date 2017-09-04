@@ -10,7 +10,7 @@ from oauth2_provider.scopes import BaseScopes
 from .models import Scope
 
 
-class RestrictApplicationScopes(BaseScopes):
+class DynamicScopes(BaseScopes):
     """
     Scopes backend that provides scopes from a Django model.
     """

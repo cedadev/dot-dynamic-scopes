@@ -9,7 +9,7 @@ from django.conf import settings
 
 import requests
 
-from oauth2_provider import settings as dot_settings
+from oauth2_provider.settings import oauth2_settings
 
 
 log = logging.getLogger("dot_dynamic_scopes")
@@ -24,12 +24,12 @@ class Scope(models.Model):
     #       scope to be available to other applications in order to request access
     #       to the resource it protects!
     application = models.ForeignKey(
+        oauth2_settings.APPLICATION_MODEL,
+        models.CASCADE,
         # This field is nullable because it is only set for scopes created by
         # external resource servers, which have a corresponding OAuth application
         # record on the authorisation server
         blank = True, null = True,
-        dot_settings.APPLICATION_MODEL,
-        models.CASCADE,
         help_text = 'The application to which the scope belongs.'
     )
     #: The name of the scope
@@ -63,7 +63,7 @@ class Scope(models.Model):
         )
         if endpoint:
             # If the endpoint is set, make the callout to the authz server
-            token = "Bearer {}".format(dot_settings.RESOURCE_SERVER_AUTH_TOKEN)
+            token = "Bearer {}".format(oauth2_settings.RESOURCE_SERVER_AUTH_TOKEN)
             # Let any failures bubble up
             # The idea is to call this method during deployment as a post-migrate
             # hook, so we want failures to halt the deployment
