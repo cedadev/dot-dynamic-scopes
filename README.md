@@ -21,7 +21,7 @@ this is implemented by having the scope registration view protected by a special
 scope which is only granted to resource servers.
 
 
-## Installation
+## Installation
 
 Just install directly from Github using using `pip`:
 
@@ -29,7 +29,7 @@ Just install directly from Github using using `pip`:
 pip install -e git+https://github.com/cedadev/dot-dynamic-scopes.git@tag_branch_or_commit_hash#egg=dot_dynamic_scopes
 ```
 
-## Usage
+## Usage
 
 The application must be enabled in `settings.py`:
 
