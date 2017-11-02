@@ -2,35 +2,74 @@
 Django views for the dot-dynamic-scopes package.
 """
 
-import re, json
+import json
+import functools
 
-from django.http import HttpResponse
-from django.utils.decorators import method_decorator
+from django.http import HttpResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods, require_POST
 
-from oauth2_provider.models import get_access_token_model
-from oauth2_provider.views import ReadWriteScopedResourceView
+from oauthlib.oauth2 import Server
+
+from oauth2_provider.oauth2_backends import OAuthLibCore
+from oauth2_provider.oauth2_validators import OAuth2Validator
+from oauth2_provider.views import IntrospectTokenView
 
 from .models import Scope
+from .settings import app_settings
 
 
-@method_decorator(csrf_exempt, name = "dispatch")
-class RegisterScopeView(ReadWriteScopedResourceView):
+def protected_resource(scopes = None):
+    """
+    Implementation of protected_resource decorator that saves the client on the
+    request for the view function to use.
+
+    Cribbed from django-oauth-toolkit.
+    """
+    _scopes = scopes or []
+    def decorator(view_func):
+        @functools.wraps(view_func)
+        def _validate(request, *args, **kwargs):
+            validator = OAuth2Validator()
+            core = OAuthLibCore(Server(validator))
+            valid, oauthlib_req = core.verify_request(request, scopes = _scopes)
+            if valid:
+                request.client = oauthlib_req.client
+                request.resource_owner = oauthlib_req.user
+                return view_func(request, *args, **kwargs)
+            return HttpResponseForbidden()
+        return _validate
+    return decorator
+
+
+
+@require_http_methods(['GET', 'POST'])
+@csrf_exempt
+@protected_resource(scopes = [app_settings.INTROSPECT_SCOPE])
+def introspect_token(request):
+    """
+    Version of the introspection view protected by a regular scope instead of
+    read-write scopes.
+
+    Also allows for the required scope to be changed using a setting.
+    """
+    if request.method == 'GET':
+        token = request.GET.get("token", None)
+    else:
+        token = request.POST.get("token", None)
+    return IntrospectTokenView.get_token_response(token)
+
+
+@require_POST
+@csrf_exempt
+@protected_resource(scopes = [app_settings.REGISTER_SCOPE_SCOPE])
+def register_scope(request):
     """
     Implements an endpoint for registering a scope.
-
-    To access this view the request must pass an OAuth2 Bearer Token which is
-    allowed to write to the scope `register-scope`.
     """
-    required_scopes = ["register-scope"]
-
-    def post(self, request, *args, **kwargs):
-        """
-        Get the scope information from the request body and create the scope as
-        required.
-        """
-        # Get the scope data from the request body
-        scope_data = json.loads(request.body)
+    # Get the scope data from the request body
+    scope_data = json.loads(request.body) if request.body else {}
+    try:
         try:
             # If a scope with the given name already exists, find it
             scope = Scope.objects.get(name = scope_data['name'])
@@ -44,12 +83,19 @@ class RegisterScopeView(ReadWriteScopedResourceView):
             )
             # Respond with a 201 Created
             return HttpResponse(status = 201)
-        # If the scope does exist, check that the current application is allowed
-        # to update it before updating it
-        if scope.application and scope.application.pk == request.client.pk:
-            scope.description = scope_data['description']
-            scope.is_default = scope_data.get('is_default', False)
-            scope.save()
-            return HttpResponse(status = 200)
-        else:
-            return HttpResponse(status = 403)
+    except KeyError as exc:
+        # A key missing in the data should be reported as a bad request
+        return HttpResponse(
+            status = 400,
+            content = "'{}' must be given in request data".format(exc.args[0]),
+            content_type = 'text/plain'
+        )
+    # If the scope does exist, check that the current application is the
+    # owner of the scope before updating it
+    if scope.application and scope.application == request.client:
+        scope.description = scope_data['description']
+        scope.is_default = scope_data.get('is_default', False)
+        scope.save()
+        return HttpResponse(status = 200)
+    else:
+        return HttpResponse(status = 403)

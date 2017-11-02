@@ -17,25 +17,10 @@ def register_scopes(app_config, verbosity = 2, interactive = True, **kwargs):
 
     The signal is connected in ``apps.py``.
     """
-    # If we are running as an authorisation server, make
-    endpoint = getattr(settings, 'DOT_DYNAMIC_SCOPES', {}).get(
-        'RESOURCE_SERVER_REGISTER_SCOPE_URL',
-        None
-    )
-    if not endpoint:
+    # Register any scopes in the oauth2_provider settings
+    for name, description in oauth2_settings.SCOPES.items():
         Scope.register(
-            name = oauth2_settings.READ_SCOPE,
-            description = 'Reading scope'
-        )
-        Scope.register(
-            name = oauth2_settings.WRITE_SCOPE,
-            description = 'Writing scope'
-        )
-        Scope.register(
-            name = 'introspection',
-            description = 'Introspect token'
-        )
-        Scope.register(
-            name = 'register-scope',
-            description = 'Register scope'
+            name,
+            description,
+            name in oauth2_settings.DEFAULT_SCOPES
         )

@@ -2,8 +2,6 @@
 Django models for the dot-dynamic-scopes package.
 """
 
-import logging
-
 from django.db import models
 from django.conf import settings
 
@@ -11,8 +9,7 @@ import requests
 
 from oauth2_provider.settings import oauth2_settings
 
-
-log = logging.getLogger("dot_dynamic_scopes")
+from .settings import app_settings
 
 
 class Scope(models.Model):
@@ -43,6 +40,7 @@ class Scope(models.Model):
         help_text = 'A brief description of the scope. This text is displayed '
                     'to users when authorising access for the scope.'
     )
+    #: Indicates if the scope should be included in the default scopes
     is_default = models.BooleanField(
         default = False,
         help_text = 'Indicates if this scope should be included in the default scopes.'
@@ -57,10 +55,7 @@ class Scope(models.Model):
 
         Returns ``True`` on success. Should raise on failure.
         """
-        endpoint = getattr(settings, 'DOT_DYNAMIC_SCOPES', {}).get(
-            'RESOURCE_SERVER_REGISTER_SCOPE_URL',
-            None
-        )
+        endpoint = app_settings.RESOURCE_SERVER_REGISTER_SCOPE_URL
         if endpoint:
             # If the endpoint is set, make the callout to the authz server
             token = "Bearer {}".format(oauth2_settings.RESOURCE_SERVER_AUTH_TOKEN)

@@ -35,5 +35,6 @@ if __name__ == "__main__":
         install_requires = [
             'django',
             'django-oauth-toolkit',
+            'jasmin-django-utils',
         ],
     )
