@@ -4,7 +4,7 @@ Settings for the ``dot_dynamic_scopes`` app.
 
 from django.conf import settings
 
-from jasmin_django_utils.appsettings import SettingsObject, Setting
+from settings_object import SettingsObject, Setting
 
 
 class AppSettings(SettingsObject):
@@ -13,4 +13,4 @@ class AppSettings(SettingsObject):
     REGISTER_SCOPE_SCOPE = Setting()
 
 
-app_settings = AppSettings('DOT_DYNAMIC_SCOPES', getattr(settings, 'DOT_DYNAMIC_SCOPES', {}))
+app_settings = AppSettings('DOT_DYNAMIC_SCOPES')
