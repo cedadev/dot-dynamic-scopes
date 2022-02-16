@@ -16,6 +16,8 @@ class Scope(models.Model):
     """
     Django model for an OAuth scope.
     """
+    id = models.AutoField(primary_key=True)
+
     #: The application that created the scope
     # NOTE: This is not used to limit access to the scope in any way - we want the
     #       scope to be available to other applications in order to request access
