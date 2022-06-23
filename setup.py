@@ -11,8 +11,7 @@ with open(os.path.join(here, 'README.md')) as f:
 if __name__ == "__main__":
     setup(
         name = 'dot-dynamic-scopes',
-        setup_requires = ['setuptools_scm'],
-        use_scm_version = True,
+        version = "1.0.0",
         description = 'Django OAuth Toolkit extension to allow scopes to be provided by a Django model.',
         long_description = README,
         classifiers = [
