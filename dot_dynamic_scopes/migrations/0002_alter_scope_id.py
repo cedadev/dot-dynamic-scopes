@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dot_dynamic_scopes', '0001_initial'),
+        ("dot_dynamic_scopes", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='scope',
-            name='id',
+            model_name="scope",
+            name="id",
             field=models.AutoField(primary_key=True, serialize=False),
         ),
     ]

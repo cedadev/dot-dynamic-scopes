@@ -9,4 +9,4 @@ from .models import Scope
 
 @admin.register(Scope)
 class ScopeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'is_default')
+    list_display = ("name", "description", "is_default")

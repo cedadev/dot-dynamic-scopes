@@ -7,8 +7,9 @@ from django.db.models.signals import post_migrate
 
 
 class AppConfig(BaseAppConfig):
-    name = 'dot_dynamic_scopes'
+    name = "dot_dynamic_scopes"
 
     def ready(self):
         from .signals import register_scopes
-        post_migrate.connect(register_scopes, sender = self)
+
+        post_migrate.connect(register_scopes, sender=self)
