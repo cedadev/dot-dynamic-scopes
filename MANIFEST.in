@@ -1,2 +1,0 @@
-include *.md *.txt *.cfg
-recursive-include dot_dynamic_scopes *.ico *.png *.gif *.jpg *.svg *.eot *.ttf *.woff *.css *.js *.txt *.html *.json *.example
