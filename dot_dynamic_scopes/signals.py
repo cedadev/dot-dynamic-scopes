@@ -1,8 +1,6 @@
 """
 Django signal handlers for the dot-dynamic-scopes package.
 """
-
-from django.conf import settings
 from oauth2_provider.settings import oauth2_settings
 
 from .models import Scope

@@ -3,7 +3,6 @@ Django models for the dot-dynamic-scopes package.
 """
 
 import requests
-from django.conf import settings
 from django.db import models
 from oauth2_provider.settings import oauth2_settings
 

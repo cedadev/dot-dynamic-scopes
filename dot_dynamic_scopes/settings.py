@@ -1,8 +1,6 @@
 """
 Settings for the ``dot_dynamic_scopes`` app.
 """
-
-from django.conf import settings
 from settings_object import Setting, SettingsObject
 
 
